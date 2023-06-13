@@ -1,4 +1,20 @@
-import type { Channel, User as DiscordUser } from 'discord.js';
+import type {
+  TextChannel,
+  Guild as DiscordGuild,
+  User as DiscordUser,
+  Role as DiscordRole,
+} from 'discord.js';
+
+export interface Guild extends Pick<DiscordGuild, 'id' | 'name' | 'description' | 'memberCount'> {
+  announcementsChannelId: string;
+  owner: Pick<DiscordUser, 'id' | 'displayName' | 'nickname' | 'presence' | 'avatar'> & {
+    joinedAt?: Date;
+  };
+  roles: (Pick<DiscordRole, 'id' | 'name'> & {
+    readonly createdAt: Date;
+  })[];
+  readonly createdAt: Date;
+}
 
 export interface User {
   readonly id: string;
@@ -8,15 +24,22 @@ export interface User {
   readonly createdAt: Date;
 }
 
+export interface GuildUser {
+  readonly guildId: string;
+  readonly userId: string;
+}
+
 export interface EmergencyContact {
   readonly id: string;
   readonly userId: string;
-  contactId?: string;
+  contact?: {
+    readonly id: string;
+    username: string;
+    avatar?: string;
+  };
   email?: string;
   readonly createdAt: Date;
 }
-
-export type EmergencyContactPolicy = 'WHITELIST_ONLY' | 'WHITELIST_AND_STAFF' | 'DISABLED';
 
 export interface EmergencyInfo {
   readonly userId: string;
@@ -29,6 +52,7 @@ export interface EmergencyInfo {
 export interface WebSession {
   readonly id: string;
   readonly userId: string;
+  readonly guildId: string;
   loggedOutAt?: Date;
   readonly createdAt: Date;
 }
@@ -44,7 +68,7 @@ export interface UserNoteTable {
 }
 
 export interface UserNote extends Omit<UserNoteTable, 'channelId' | 'userId'> {
-  channel: Channel;
+  channel: TextChannel;
   user: DiscordUser;
   createdBy: DiscordUser;
 }
